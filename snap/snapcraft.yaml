@@ -1,0 +1,92 @@
+name: sonic3air
+base: core24
+version: '24.02.02.0-stable'
+platforms:
+  amd64:
+    build-on: [amd64]
+    build-for: [amd64]
+summary: Fan-made remaster of Sonic 3&K
+description: |
+  Dr. Eggman’s (AKA Dr. Robotnik’s) Death Egg was once again blasted by Sonic, crash-landing on the peak of a volcano on the Floating Island.
+
+  Dr. Eggman is still at large, and Sonic can’t allow him to get his hands on the Master Emerald and repair the Death Egg. Sonic must also keep Knuckles off his back but Knuckles has problems too. As guardian of the Floating Island and all the Emeralds, Knuckles must do his part to keep the island safe. While they’re going the rounds with each other, who will stop Dr. Eggman?
+
+  To play Sonic 3 - Angel Island Revisited, you need Sonic 3 & Knuckles from the SEGA Mega Drive & Genesis Classics collection installed on Steam.
+
+grade: stable
+confinement: strict
+
+
+apps:
+  sonic3air:
+    command: usr/bin/sonic3air
+    desktop: usr/applications/sonic3air.desktop
+    extensions:
+      - kde-neon-6
+    plugs:
+      - home
+      - removable-media
+      - gtk-3-themes
+      - icon-themes
+      - desktop
+      - desktop-legacy
+      - x11
+      - opengl
+      - wayland
+      - audio-playback
+      - joystick
+      - screen-inhibit-control
+      - network
+
+parts:
+  sonic3air:
+    plugin: dump
+    source: https://github.com/Eukaryot/sonic3air/releases/download/v24.02.02.0-stable/sonic3air_game.tar.gz
+    override-build: |
+      craftctl default
+      pwd
+      ls -l
+      mkdir -p $CRAFT_PART_INSTALL/usr/bin/
+      mkdir -p $CRAFT_PART_INSTALL/usr/lib/
+      mv -f $CRAFT_PART_INSTALL/sonic3air_linux $CRAFT_PART_INSTALL/usr/bin
+      mv -f $CRAFT_PART_INSTALL/libdiscord_game_sdk.so $CRAFT_PART_INSTALL/usr/lib
+      mv -f $CRAFT_PART_INSTALL/data $CRAFT_PART_INSTALL/usr/bin
+      mv -f $CRAFT_PART_INSTALL/config.json $CRAFT_PART_INSTALL/usr/bin
+      chmod -R 777 $CRAFT_PART_INSTALL/usr/bin/data
+    prime:
+      - usr/bin/sonic3air_linux
+      - usr/lib/libdiscord_game_sdk.so
+      - usr/bin/data/
+      - usr/bin/config.json
+  
+  sonic3air-launcher:
+    after: [sonic3air]
+    plugin: dump
+    source: ./launcher
+    override-build: |
+      craftctl default
+      pwd
+      ls -l
+      mkdir -p $CRAFT_PART_INSTALL/usr/bin/
+      mkdir -p $CRAFT_PART_INSTALL/usr/applications
+      mkdir -p $CRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps
+      mv -f $CRAFT_PART_INSTALL/sonic3air-launcher.sh $CRAFT_PART_INSTALL/usr/bin/sonic3air
+      mv -f $CRAFT_PART_INSTALL/sonic3air.desktop $CRAFT_PART_INSTALL/usr/applications/
+      mv -f $CRAFT_PART_INSTALL/sonic3air.png $CRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps
+    prime:
+      - usr/bin/sonic3air
+      - usr/applications/sonic3air.desktop
+      - usr/share/icons/hicolor/scalable/apps/sonic3air.png
+
+  qarma:
+    after: [sonic3air-launcher]
+    plugin: dump
+    source: https://github.com/Kyuyrii/source-repository/releases/download/qarma-1.0.0-binary/qarma-v1.0.0-binary.tar.gz
+    override-build: |
+      craftctl default
+      pwd
+      ls -l
+      mkdir -p $CRAFT_PART_INSTALL/usr/bin/
+      mv -f $CRAFT_PART_INSTALL/qarma $CRAFT_PART_INSTALL/usr/bin/
+    prime:
+      - usr/bin/qarma

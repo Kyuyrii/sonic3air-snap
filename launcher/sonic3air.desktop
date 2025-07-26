@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Sonic 3 A.I.R.
+Exec=${SNAP}/usr/bin/sonic3air
+Icon=${SNAP}/usr/share/icons/hicolor/scalable/apps/sonic3air.png
+Terminal=false
+Type=Application
+Categories=Game;
+StartupNotify=true
